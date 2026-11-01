@@ -1,0 +1,43 @@
+start-all.sh
+start-hbase.sh
+
+sudo apt update
+sudo apt install mysql-server
+sudo systemctl start mysql
+
+sudo mysql -u root -p
+
+mysql> CREATE TABLE employees(...)
+mysql> INSERT INTO ...
+
+wget https://archive.apache.org/dist/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+tar xvzf ~/Downloads/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+sudo mv sqoop-1.4.7.bin__hadoop-2.6.0 /usr/local/sqoop
+
+cd /usr/local/sqoop/lib
+sudo wget https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-j-8.0.33.tar.gz
+sudo tar xvzf mysql-connector-j-8.0.33.tar.gz
+sudo cp mysql-connector-j-8.0.33/mysql-connector-j-8.0.33.jar .
+
+sqoop import \
+--connect jdbc:mysql://localhost/company \
+--username root \
+--table employees \
+--target-dir /user/ubuntu/employees_data \
+--m 1
+
+check: hdfs dfs -cat /user/ubuntu/employees_data/part-m-00000
+
+Create a new table in MySQL for export:
+mysql> CREATE TABLE employees_export (id INT, name VARCHAR(50), department VARCHAR(50), salary INT);
+
+in /usr/local/sqoop/lib:
+sqoop export \
+--connect jdbc:mysql://localhost/company \
+--username root \
+--table employees_export \
+--export-dir /user/ubuntu/employees_filtered \
+--input-fields-terminated-by ',' \
+--m 1
+
+mysql> SELECT * FROM employees_export;

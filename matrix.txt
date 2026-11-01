@@ -1,0 +1,99 @@
+mapper.py:
+#!/usr/bin/env python3
+import sys
+
+# Define the target matrix dimension bounds
+# If multiplying A (I x J) and B (J x K), set the max ranges here
+NUM_ROWS_A = 2  # Max value for 'i' (0 to I-1)
+NUM_COLS_B = 2  # Max value for 'k' (0 to K-1)
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+        
+    parts = line.split(',')
+    matrix = parts[0]
+    row = int(parts[1])
+    col = int(parts[2])
+    value = float(parts[3])
+    
+    if matrix == 'A':
+        # Send A[i][j] to every cell (i, k) where k is a column in B
+        for k in range(NUM_COLS_B):
+            # Output format: key = "i,k", value = "A,j,value"
+            print(f"{row},{k}\tA,{col},{value}")
+            
+    elif matrix == 'B':
+        # Send B[j][k] to every cell (i, k) where i is a row in A
+        for i in range(NUM_ROWS_A):
+            # Output format: key = "i,k", value = "B,j,value"
+            print(f"{i},{col}\tB,{row},{value}")
+
+reducer.py:
+#!/usr/bin/env python3
+import sys
+from collections import defaultdict
+
+current_key = None
+matrix_A_elements = {}
+matrix_B_elements = {}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+        
+    # Split the key (i,k) and value information
+    key, val_str = line.split('\t')
+    parts = val_str.split(',')
+    
+    matrix = parts[0]
+    j_idx = int(parts[1])
+    value = float(parts[2])
+    
+    # Check if we moved to a new output cell (i,k)
+    if current_key != key:
+        if current_key:
+            # Process and output the cell result for the completed key
+            grand_total = 0.0
+            for j in matrix_A_elements:
+                if j in matrix_B_elements:
+                    grand_total += matrix_A_elements[j] * matrix_B_elements[j]
+            print(f"{current_key}\t{grand_total}")
+            
+        # Reset trackers for the new cell
+        current_key = key
+        matrix_A_elements = {}
+        matrix_B_elements = {}
+        
+    # Add elements to the respective tracker dictionary based on the common index 'j'
+    if matrix == 'A':
+        matrix_A_elements[j_idx] = value
+    elif matrix == 'B':
+        matrix_B_elements[j_idx] = value
+
+# Output the final remaining key after the loop terminates
+if current_key:
+    grand_total = 0.0
+    for j in matrix_A_elements:
+        if j in matrix_B_elements:
+            grand_total += matrix_A_elements[j] * matrix_B_elements[j]
+    print(f"{current_key}\t{grand_total}")
+
+
+chmod +x matrix_mapper.py
+chmod +x matrix_reducer.py
+
+hadoop fs -mkdir -p /matrix/input
+hadoop fs -put matrix_input.txt /matrix/input
+
+hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
+-input /matrix/input \
+-output /matrix/output \
+-mapper matrix_mapper.py \
+-reducer matrix_reducer.py \
+-file matrix_mapper.py \
+-file matrix_reducer.py
+
+hdfs dfs -cat /matrix/output/part-*

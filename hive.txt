@@ -1,0 +1,44 @@
+cd ~
+wget https://archive.apache.org/dist/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz
+
+nano ./bashrc
+export HIVE_HOME=/home/ubuntu/apache-hive-3.1.2-bin
+export PATH=PATH:HIVE_HOME/bin
+
+source ~/.bashrc
+
+nano core-site.xml
+<property>
+    <name>hadoop.proxyuser.ubuntu.groups</name>
+    <value>*</value>
+</property>
+<property>
+    <name>hadoop.proxyuser.ubuntu.hosts</name>
+    <vale>*</value>
+</property>
+
+start-all.sh
+
+hadoop fs -mkdir /tmp
+hadoop fs -mkdir -p /user/hive/warehouse
+hadoop fs -chmod g+w /tmp
+hadoop fs -chmod g+w /user/hive/warehouse
+
+rm $HIVE_HOME/lib/guava-19.0.jar
+cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar $HIVE_HOME/lib/
+
+cd ~/apache-hive-3.1.2-bin
+bin/schematool -dbType derby -initSchema
+
+bin/hive
+
+hive> SHOW DATABASES;
+...
+
+new terminal:
+nano temp.csv
+5,Ravi,29,48000.0,HR
+6,Kiran,41,90000.0,Finance
+
+hive> LOAD DATA LOCAL INPATH "/home/ubuntu/emp.csv" INTO TABLE employee;
+

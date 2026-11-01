@@ -1,0 +1,109 @@
+cd ~
+wget https://archive.apache.org/dist/hbase/2.2.0/hbase-2.2.0-bin.tar.gz
+
+tar -xzf hbase-2.2.0-bin.tar.gz
+sudo mv hbase-2.2.0 /usr/local/hbase
+sudo chown -R ubuntu:ubuntu /usr/local/hbase
+ls /usr/local/hbase
+
+nano ~/.bashrc
+export HBASE_HOME=/usr/local/hbase
+export PATH=$PATH:$HBASE_HOME/bin
+export HADOOP_HOME=/home/ubuntu/hadoop-3.2.3
+source ~/.bashrc
+
+cd $HBASE_HOME/conf
+nano hbase-env.sh
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+nano hbase-site.xml
+
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>hbase.rootdir</name>
+        <value>hdfs://localhost:9000/hbase</value>
+    </property>
+
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hbase.zookeeper.quorum</name>
+        <value>localhost</value>
+    </property>
+
+    <property>
+        <name>hbase.zookeeper.property.clientPort</name>
+        <value>2181</value>
+    </property>
+</configuration>
+
+start-all.sh
+start-hbase.sh
+
+If start-hbase.sh prints zookeeper running as process ... Stop it first, HBase is already running. Run
+stop-hbase.sh and start it again if you want a clean start. Check using http://localhost:16010.
+
+
+hbase-daemon.sh start thrift
+jps
+ThriftServer appears in the jps output. It listens on port 9090, and its web UI is at
+http://localhost:9095.
+
+sudo apt update
+sudo apt install -y thrift-compiler python3-pip
+pip3 install thrift happybase --break-system-packages
+thrift -version
+
+nano thrift_test.py
+
+import happybase
+
+# Connect to the HBase Thrift server
+conn = happybase.Connection('localhost', port=9090)
+conn.open()
+
+# Display existing tables
+print(conn.tables())
+
+# Create a table with one column family
+conn.create_table('thrift_demo', {'cf1': dict()})
+
+# Access the table
+table = conn.table('thrift_demo')
+
+# Insert a row
+table.put(b'row1', {b'cf1:name': b'Archana'})
+
+# Retrieve and display the row
+print(table.row(b'row1'))
+
+# Scan all rows
+for key, data in table.scan():
+    print(key, data)
+
+# Disable and delete the table
+conn.disable_table('thrift_demo')
+conn.delete_table('thrift_demo')
+
+# Close the connection
+conn.close()
+
+python3 thrift_test.py
+
+basic commands:
+hbase shell
+
+hbase> list
+hbase> create 'my_table', 'cf1'
+hbase> put 'my_table', 'row1', 'cf1:name', 'Archana'
+hbase> get 'my_table', 'row1'
+
+
+hbase-daemon.sh stop thrift
+stop-hbase.sh
+stop-all.sh
