@@ -1,0 +1,141 @@
+1. Navigation & The File System
+# Command Description Example
+1 pwd Print the full path of the current working
+
+directory.
+
+pwd
+2 ls List files and directories in the current location. ls -la
+3 cd Change the current directory. cd Documents
+4 cd .. Move up one directory level. cd ..
+5 cd ~ Go to the home directory. cd ~
+6 cd - Switch to the previous directory. cd -
+7 tree Show directories as a recursive tree structure. tree -L 2
+8 find Search for files/directories by name, type, or size. find . -name "*.txt"
+9 locate Quickly find files using a prebuilt index. locate report.pdf
+10 which Show the full path of a shell command. which python3
+11 stat Display detailed status/metadata of a file. stat notes.txt
+12 du Show disk usage of files and directories. du -sh *
+13 df Show free and used disk space on mounted filesystems. df -h
+
+2. File & Directory Operations
+# Command Description Example
+14 touch Create an empty file or update its timestamp. touch notes.txt
+15 mkdir Create a new directory. mkdir project
+16 mkdir -p Create nested directories in one step. mkdir -p a/b/c
+17 rmdir Remove an empty directory. rmdir old_folder
+18 rm Remove files. rm notes.txt
+19 rm -r Remove a directory and its contents recursively. rm -r project
+20 rm -rf Force-remove files/directories without confirmation (use carefully!). rm -rf temp/
+21 cp Copy files or directories. cp a.txt b.txt
+22 cp -r Copy a directory recursively. cp -r src dest
+23 mv Move or rename files and directories. mv old.txt new.txt
+24 ln Create a hard link between files. ln file.txt link.txt
+25 ln -s Create a symbolic (soft) link. ln -s /path/target shortcut
+26 cat > file Create/overwrite a file with typed input. cat > notes.txt
+27 shred Securely delete a file by overwriting its data. shred -u secret.txt
+
+3. Viewing & Editing File Contents
+# Command Description Example
+28 cat Print and concatenate file contents to the screen. cat notes.txt
+29 less View file contents one page at a time (scrollable). less bigfile.log
+30 head Show the first lines of a file. head -n 10 notes.txt
+31 tail Show the last lines of a file. tail -n 10 notes.txt
+32 tail -f Follow a file in real time as it grows (great forlogs). tail -f /var/log/syslog
+33 nano Edit a file with the beginner-friendly nano editor. nano notes.txt
+34 vim Edit a file with the powerful vim editor. vim notes.txt
+35 diff Compare two files line by line. diff file1.txt file2.txt
+36 wc Count lines, words, and characters in a file. wc -l notes.txt
+
+4. Permissions & Ownership
+# Command Description Example
+37 chmod Change file/directory permissions. chmod 755 script.sh
+38 chmod +x Make a file executable. chmod +x script.sh
+39 chown Change file owner and group. sudo chown user:group file.txt
+40 chgrp Change the group ownership of a file. sudo chgrp students file.txt
+41 sudo Run a command with administrator (root) privileges. sudo apt update
+42 su Switch to another user account. su - username
+43 passwd Change a user's login password. passwd
+
+5. Searching & Text Processing
+# Command Description Example
+44 grep Search for a text pattern inside files. grep "error" log.txt
+45 grep -r Search recursively through a directory. grep -r "TODO" ./src
+46 sed Stream editor for find-and-replace on text. sed 's/foo/bar/g' file.txt
+47 awk Pattern-based text processing and column extraction. awk '{print $1}' data.txt
+48 sort Sort lines of a text file. sort names.txt
+49 uniq Remove or count duplicate adjacent lines. uniq -c names.txt
+50 cut Extract sections/columns from each line of text. cut -d',' -f1 data.csv
+
+6. Process & Job Management
+# Command Description Example
+51 ps Show currently running processes. ps aux
+52 top Display real-time system and process activity. top
+53 htop An interactive, colorful version of top. htop
+54 kill Terminate a process using its PID. kill 1234
+55 kill -9 Force-terminate a process immediately. kill -9 1234
+56 jobs List background jobs running in the shell. jobs
+57 bg Resume a suspended job in the background. bg %1
+58 fg Bring a background job to the foreground. fg %1
+
+7. System Information
+# Command Description Example
+
+59 uname Print system and kernel information. uname -a
+60 whoami Print the current logged-in username. whoami
+61 hostname Show or set the system's hostname. hostname
+62 uptime Show how long the system has been running. uptime
+63 date Display or set the system date and time. date
+64 free Show free and used memory (RAM) in the system. free -h
+65 lscpu Display detailed CPU architecture information. lscpu
+66 history Show a list of previously run commands. history
+
+8. Networking
+# Command Description Example
+67 ping Test connectivity to a host over the network. ping google.com
+68 ifconfig Display or configure network interfaces (legacy tool). ifconfig
+69 ip addr Show network interfaces and IP addresses (modern tool). ip addr show
+70 curl Transfer data from or to a server (view/download URLs). curl https://example.com
+71 wget Download files from the web. wget https://example.com/file.zip
+72 ssh Securely log in to a remote machine. ssh user@192.168.1.10
+73 scp Securely copy files between machines over SSH. scp file.txt user@host:/path
+74 nslookup Query DNS to find domain/IP information. nslookup google.com
+
+9. Package Management (Debian/Ubuntu)
+# Command Description Example
+75 apt update Refresh the local list of available packages. sudo apt update
+76 apt upgrade Upgrade all installed packages to their latest versions. sudo apt upgrade
+77 apt install Install a new software package. sudo apt install git
+78 apt remove Remove an installed package. sudo apt remove git
+79 dpkg Install or inspect low-level .deb package files. dpkg -i package.deb
+80 snap Install and manage universal Snap packages. sudo snap install code
+
+10. Archiving & Compression
+# Command Description Example
+81 tar Archive multiple files into a single .tar file. tar -cvf archive.tar folder/
+82 tar -x Extract files from a .tar archive. tar -xvf archive.tar
+83 gzip Compress a file using gzip (.gz). gzip file.txt
+84 gunzip Decompress a .gz file. gunzip file.txt.gz
+85 zip Compress files into a .zip archive. zip archive.zip file1 file2
+86 unzip Extract files from a .zip archive. unzip archive.zip
+
+11. Users & Environment
+
+# Command Description Example
+87 useradd Create a new user account. sudo useradd newstudent
+88 userdel Delete a user account. sudo userdel newstudent
+89 who Show who is currently logged into the system. who
+90 id Display user and group ID information. id
+91 env Display current environment variables. env
+92 alias Create a shortcut name for a command. alias ll='ls -la'
+93 echo Print text or variable values to the terminal. echo "Hello World"
+
+12. Useful Utilities & Experimentation
+# Command Description Example
+94 man Open the manual page for a command. man ls
+95 --help Show quick usage help for most commands. ls --help
+96 clear Clear the terminal screen. clear
+97 exit Close the current terminal session. exit
+98 echo $? Show the exit status of the last command. echo $?
+99 xargs Build and execute commands from piped input. cat files.txt | xargs rm
+100 watch Repeatedly run a command and show live output. watch -n 1 date
