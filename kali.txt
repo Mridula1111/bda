@@ -139,3 +139,20 @@ pwd
 98 echo $? Show the exit status of the last command. echo $?
 99 xargs Build and execute commands from piped input. cat files.txt | xargs rm
 100 watch Repeatedly run a command and show live output. watch -n 1 date
+
+
+Open Burpsuite, and start burp.
+Go to the Proxy tab and open browser
+Open the OWASP Juice Shop login page in the browser, and give any credentials to login. The login will fail.
+Now, in Proxy, check the HTTP History, and find the POST request to /login
+Send the request to Intruder
+In the Intruder tab, add payload to the email by selecting the email and clicking the Add button. Ensure the attack type is set to Sniper Attack since we only have one payload.
+Get some generic SQLi payloads from Github at payload-box/sql-injection-payload-list. Copy the payloads.
+Paste the payloads into the payload configuration. Ensure the URL-encoding option is not selected.
+Start the attack after configuring the payloads
+Once the attack is over, find the Request with a status code of 200 (Success). We can view the correct login email in the response.
+Select the token generated in the response and send it to Decoder.
+Decode the token as Base64, and view as Text not Hex. The password will be present as a hash value.
+Decrypt the 32-char hex string which is an MD5 hash using CrackStation tool to find the password.
+Now use the login details we have found to login to the website.
+
