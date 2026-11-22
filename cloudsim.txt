@@ -1,0 +1,280 @@
+1. Open IntelliJ IDEA.
+2. Click New Project.
+3. Select Java.
+4. Set the following:
+Setting	Value
+Name:	CustomSJFCloudSim
+Build system:	Maven
+JDK	17 or a compatible installed JDK
+GroupId:	org.example
+ArtifactId:	customsjf
+
+5. Click Create
+6. pom.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>customsjf</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.cloudsimplus</groupId>
+            <artifactId>cloudsim-plus</artifactId>
+            <version>8.0.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+7. Click Load Maven Changes if IntelliJ prompts you. Or open the Maven panel and click Reload All Maven Projects.
+8. Right-click the java folder. Select New → Java Class. Enter the name: SJFScheduling Press Enter. Open the newly created file.
+9. Paste your entire code into it, starting with the import statements and ending with the final closing brace }.
+
+import org.cloudsimplus.brokers.DatacenterBrokerSimple;
+import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
+import org.cloudsimplus.cloudlets.Cloudlet;
+import org.cloudsimplus.cloudlets.CloudletSimple;
+import org.cloudsimplus.core.CloudSimPlus;
+import org.cloudsimplus.datacenters.DatacenterSimple;
+import org.cloudsimplus.hosts.Host;
+import org.cloudsimplus.hosts.HostSimple;
+import org.cloudsimplus.resources.Pe;
+import org.cloudsimplus.resources.PeSimple;
+import org.cloudsimplus.utilizationmodels.UtilizationModelFull;
+import org.cloudsimplus.vms.Vm;
+import org.cloudsimplus.vms.VmSimple;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+public class SJFScheduling {
+
+    public static void main(String[] args) {
+
+        System.out.println("Starting CloudSim SJF Simulation...");
+
+        // ------------------------------------------------
+        // STEP 1: Initialize CloudSim
+        // ------------------------------------------------
+        CloudSimPlus simulation = new CloudSimPlus();
+
+        // ------------------------------------------------
+        // STEP 2: Create Host
+        // ------------------------------------------------
+
+        // Create CPU cores (Processing Elements)
+        List<Pe> peList = new ArrayList<>();
+
+        // Create 4 CPU cores, each having 1000 MIPS
+        for (int i = 0; i < 4; i++) {
+            peList.add(new PeSimple(1000));
+        }
+
+        // Host configuration
+        long hostRam = 8192; // MB
+        long hostBandwidth = 10000;
+        long hostStorage = 1000000;
+
+        Host host = new HostSimple(
+                hostRam,
+                hostBandwidth,
+                hostStorage,
+                peList
+        );
+
+        // ------------------------------------------------
+        // STEP 3: Create Datacenter
+        // ------------------------------------------------
+
+        List<Host> hostList = new ArrayList<>();
+        hostList.add(host);
+
+        DatacenterSimple datacenter =
+                new DatacenterSimple(simulation, hostList);
+
+        // ------------------------------------------------
+        // STEP 4: Create Broker
+        // ------------------------------------------------
+
+        DatacenterBrokerSimple broker =
+                new DatacenterBrokerSimple(simulation);
+
+        // ------------------------------------------------
+        // STEP 5: Create Virtual Machines
+        // ------------------------------------------------
+
+        List<Vm> vmList = new ArrayList<>();
+
+        // VM 0
+        Vm vm0 = new VmSimple(1000, 1);
+
+        vm0.setRam(512)
+                .setBw(1000)
+                .setSize(10000);
+
+        // VM 1
+        Vm vm1 = new VmSimple(1000, 1);
+
+        vm1.setRam(512)
+                .setBw(1000)
+                .setSize(10000);
+
+        vmList.add(vm0);
+        vmList.add(vm1);
+
+        // ------------------------------------------------
+        // STEP 6: Create Cloudlets
+        // ------------------------------------------------
+
+        List<Cloudlet> cloudletList = new ArrayList<>();
+
+        UtilizationModelFull utilization =
+                new UtilizationModelFull();
+
+        // Cloudlet 0 - Length 40000 MI
+        Cloudlet cloudlet0 =
+                new CloudletSimple(40000, 1, utilization);
+        cloudlet0.setId(0);
+
+        // Cloudlet 1 - Length 10000 MI
+        Cloudlet cloudlet1 =
+                new CloudletSimple(10000, 1, utilization);
+        cloudlet1.setId(1);
+
+        // Cloudlet 2 - Length 30000 MI
+        Cloudlet cloudlet2 =
+                new CloudletSimple(30000, 1, utilization);
+        cloudlet2.setId(2);
+
+        // Cloudlet 3 - Length 5000 MI
+        Cloudlet cloudlet3 =
+                new CloudletSimple(5000, 1, utilization);
+        cloudlet3.setId(3);
+
+        // Cloudlet 4 - Length 20000 MI
+        Cloudlet cloudlet4 =
+                new CloudletSimple(20000, 1, utilization);
+        cloudlet4.setId(4);
+
+        // Add all Cloudlets to the list
+        cloudletList.add(cloudlet0);
+        cloudletList.add(cloudlet1);
+        cloudletList.add(cloudlet2);
+        cloudletList.add(cloudlet3);
+        cloudletList.add(cloudlet4);
+
+        // ------------------------------------------------
+        // STEP 7: Display jobs BEFORE SJF
+        // ------------------------------------------------
+
+        System.out.println();
+        System.out.println("Cloudlets BEFORE SJF Scheduling");
+        System.out.println("--------------------------------");
+
+        for (Cloudlet cloudlet : cloudletList) {
+            System.out.println(
+                    "Cloudlet " +
+                            cloudlet.getId() +
+                            " : " +
+                            cloudlet.getLength() +
+                            " MI"
+            );
+        }
+
+        // =================================================
+        // STEP 8: CUSTOM SJF SCHEDULING ALGORITHM
+        // =================================================
+
+        cloudletList.sort(
+                Comparator.comparingLong(Cloudlet::getLength)
+        );
+
+        // ------------------------------------------------
+        // STEP 9: Display jobs AFTER SJF
+        // ------------------------------------------------
+
+        System.out.println();
+        System.out.println("Cloudlets AFTER SJF Scheduling");
+        System.out.println("--------------------------------");
+
+        for (Cloudlet cloudlet : cloudletList) {
+            System.out.println(
+                    "Cloudlet " +
+                            cloudlet.getId() +
+                            " : " +
+                            cloudlet.getLength() +
+                            " MI"
+            );
+        }
+
+        // ------------------------------------------------
+        // STEP 10: Assign Cloudlets to VMs
+        // ------------------------------------------------
+
+        /*
+         * After SJF sorting:
+         *
+         * Shortest Cloudlet -> VM 0
+         * Next Cloudlet -> VM 1
+         * Next Cloudlet -> VM 0
+         * and so on.
+         */
+
+        for (int i = 0; i < cloudletList.size(); i++) {
+
+            Vm selectedVm = vmList.get(i % vmList.size());
+
+            cloudletList.get(i).setVm(selectedVm);
+        }
+
+        // ------------------------------------------------
+        // STEP 11: Submit VMs to Broker
+        // ------------------------------------------------
+
+        broker.submitVmList(vmList);
+
+        // ------------------------------------------------
+        // STEP 12: Submit Cloudlets to Broker
+        // ------------------------------------------------
+
+        broker.submitCloudletList(cloudletList);
+
+        // ------------------------------------------------
+        // STEP 13: Start Simulation
+        // ------------------------------------------------
+
+        System.out.println();
+        System.out.println("Starting Simulation...");
+        System.out.println();
+
+        simulation.start();
+
+        // ------------------------------------------------
+        // STEP 14: Display Results
+        // ------------------------------------------------
+
+        System.out.println();
+        System.out.println("SJF Scheduling Simulation Completed");
+        System.out.println();
+
+        new CloudletsTableBuilder(
+                broker.getCloudletFinishedList()
+        ).build();
+    }
+}
+
+10. Open SJFScheduling.java. Find public static void main(String[] args). Click the green ▶ icon beside it. Click Run 'SJFScheduling.main()'.
